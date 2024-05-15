@@ -7,5 +7,25 @@ class ILoanRepository(ABC):
         pass
 
     @abstractmethod
-    def calculateInterest(self, loan_id):
+    def calculateInterest(self, loanId):
+        pass
+
+    @abstractmethod
+    def loanStatus(self, loanId):
+        pass
+
+    @abstractmethod
+    def calculateEMI(self, loanId):
+        pass
+
+    @abstractmethod
+    def loanRepayment(self, loanId, amount):
+        pass
+
+    @abstractmethod
+    def getAllLoan(self):
+        pass
+
+    @abstractmethod
+    def getLoanById(self, loanId):
         pass
