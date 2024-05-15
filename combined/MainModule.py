@@ -117,3 +117,8 @@ class LoanManagement:
             print(f"Loan Details for Loan ID {loan_id}: {loan}")
         except InvalidLoanException as e:
             print(e)
+
+
+if __name__ == "__main__":
+    loan_management = LoanManagement()
+    loan_management.main()
