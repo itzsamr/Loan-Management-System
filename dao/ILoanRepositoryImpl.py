@@ -1,5 +1,5 @@
 from ILoanRepository import ILoanRepository
-from DBConnUtil import DBConnUtil
+from util.DBConnection import DBConnUtil
 
 
 class ILoanRepositoryImpl(ILoanRepository):
