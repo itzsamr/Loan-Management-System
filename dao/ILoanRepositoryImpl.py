@@ -1,4 +1,5 @@
-from ILoanRepository import ILoanRepository
+from abc import ABC, abstractmethod
+from .ILoanRepository import ILoanRepository
 from util.DBConnection import DBConnUtil
 
 
