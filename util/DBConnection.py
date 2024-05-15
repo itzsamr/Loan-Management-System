@@ -1,17 +1,15 @@
 import pyodbc
-from .PropertyUtil import PropertyUtil
+from DBPropertyUtil import DBPropertyUtil
 
 
-class DBConnection:
-    connection = None
-
+class DBConnUtil:
     @staticmethod
-    def getConnection():
-        if DBConnection.connection is None:
-            connection_string = PropertyUtil.getPropertyString()
-            try:
-                DBConnection.connection = pyodbc.connect(connection_string)
-                print("Connected to database successfully")
-            except pyodbc.Error as e:
-                print(f"Error while connecting to SQL database: {e}")
-        return DBConnection.connection
+    def get_connection():
+        connection_string = DBPropertyUtil.get_connection_string()
+        try:
+            connection = pyodbc.connect(connection_string)
+            print("Connected to database successfully")
+            return connection
+        except pyodbc.Error as e:
+            print(f"Error while connecting to SQL database: {e}")
+            return None
