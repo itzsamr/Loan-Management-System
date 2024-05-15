@@ -1,6 +1,7 @@
-from dao.ILoanRepositoryImpl import ILoanRepositoryImpl
-from .entity.Loan import Loan
-from exception.InvalidLoanException import InvalidLoanException
+from dao import *
+from entity import *
+from util import *
+from exception import *
 
 
 class LoanManagement:
