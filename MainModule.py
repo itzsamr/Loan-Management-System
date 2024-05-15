@@ -1,4 +1,4 @@
-from dao import *
+from dao import ILoanRepositoryImpl
 from entity import *
 from util import *
 from exception import *
