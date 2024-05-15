@@ -1,6 +1,6 @@
-from .ILoanRepository import ILoanRepository
+from ILoanRepository import ILoanRepository
 from .DBConnection import DBConnUtil
-from .InvalidLoanException import InvalidLoanException
+from InvalidLoanException import InvalidLoanException
 
 
 class ILoanRepositoryImpl(ILoanRepository):

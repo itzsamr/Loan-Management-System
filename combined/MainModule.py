@@ -1,6 +1,6 @@
-from .ILoanRepositoryImpl import ILoanRepositoryImpl
-from .Loan import Loan
-from .InvalidLoanException import InvalidLoanException
+from ILoanRepositoryImpl import ILoanRepositoryImpl
+from Loan import Loan
+from InvalidLoanException import InvalidLoanException
 
 
 class LoanManagement:
