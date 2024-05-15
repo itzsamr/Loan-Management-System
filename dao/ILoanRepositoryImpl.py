@@ -1,4 +1,4 @@
-from .ILoanRepository import ILoanRepository
+from ILoanRepository import ILoanRepository
 from util.DBConnection import DBConnection
 from exception.InvalidLoanException import InvalidLoanException
 
