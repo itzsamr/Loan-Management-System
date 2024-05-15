@@ -15,10 +15,4 @@ The Loan Management System allows users to perform various operations related to
 - Make loan repayments
 - Retrieve loan details
 
-## Installation
 
-1. Clone the repository:
-
-   ```bash
-   git clone https://github.com/itzsamr/LoanManagementSystem.git
-   ```
