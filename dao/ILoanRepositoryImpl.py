@@ -1,11 +1,11 @@
 from ILoanRepository import ILoanRepository
-from util.DBConnection import DBConnection
+from util.DBConnection import DBConnUtil
 from exception.InvalidLoanException import InvalidLoanException
 
 
 class ILoanRepositoryImpl(ILoanRepository):
     def __init__(self):
-        self.connection = DBConnection.getConnection()
+        self.connection = DBConnUtil.getConnection()
 
     def applyLoan(self, loan):
         try:
