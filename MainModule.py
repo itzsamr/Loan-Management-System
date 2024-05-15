@@ -1,4 +1,5 @@
 from dao.ILoanRepositoryImpl import ILoanRepositoryImpl
+from .entity.Loan import Loan
 from exception.InvalidLoanException import InvalidLoanException
 
 
@@ -40,29 +41,79 @@ class LoanManagement:
                 print("Invalid choice. Please enter a valid option.")
 
     def apply_loan(self):
-        # Implement apply loan functionality
-        pass
+        loan_id = int(input("Enter Loan ID: "))
+        customer_id = int(input("Enter Customer ID: "))
+        principal_amount = float(input("Enter Principal Amount: "))
+        interest_rate = float(input("Enter Interest Rate: "))
+        loan_term = int(input("Enter Loan Term (in months): "))
+        loan_type = input("Enter Loan Type (CarLoan/HomeLoan): ")
+        customer_credit_score = int(input("Enter Customer Credit Score: "))
+
+        loan = Loan(
+            loan_id,
+            customer_id,
+            principal_amount,
+            interest_rate,
+            loan_term,
+            loan_type,
+            "Pending",
+        )
+        try:
+            self.loan_repo.applyLoan(loan)
+            self.loan_repo.loanStatus(loan_id, customer_credit_score)
+            print("Loan applied successfully!")
+        except InvalidLoanException as e:
+            print(e)
 
     def calculate_interest(self):
-        # Implement calculate interest functionality
-        pass
+        loan_id = int(input("Enter Loan ID: "))
+        try:
+            interest = self.loan_repo.calculateInterest(loan_id)
+            print(f"Interest for Loan ID {loan_id}: {interest}")
+        except InvalidLoanException as e:
+            print(e)
 
     def check_loan_status(self):
-        # Implement check loan status functionality
-        pass
+        loan_id = int(input("Enter Loan ID: "))
+        try:
+            status_message = self.loan_repo.loanStatus(loan_id)
+            print(f"Loan Status: {status_message}")
+        except InvalidLoanException as e:
+            print(e)
 
     def calculate_emi(self):
-        # Implement calculate EMI functionality
-        pass
+        loan_id = int(input("Enter Loan ID: "))
+        try:
+            emi = self.loan_repo.calculateEMI(loan_id)
+            print(f"EMI for Loan ID {loan_id}: {emi}")
+        except InvalidLoanException as e:
+            print(e)
 
     def make_loan_repayment(self):
-        # Implement make loan repayment functionality
-        pass
+        loan_id = int(input("Enter Loan ID: "))
+        amount = float(input("Enter Repayment Amount: "))
+        try:
+            repayment_message = self.loan_repo.loanRepayment(loan_id, amount)
+            print(repayment_message)
+        except InvalidLoanException as e:
+            print(e)
 
     def get_all_loans(self):
-        # Implement get all loans functionality
-        pass
+        try:
+            loans = self.loan_repo.getAllLoan()
+            if loans:
+                print("All Loans:")
+                for loan in loans:
+                    print(loan)
+            else:
+                print("No loans found.")
+        except InvalidLoanException as e:
+            print(e)
 
     def get_loan_by_id(self):
-        # Implement get loan by ID functionality
-        pass
+        loan_id = int(input("Enter Loan ID: "))
+        try:
+            loan = self.loan_repo.getLoanById(loan_id)
+            print(f"Loan Details for Loan ID {loan_id}: {loan}")
+        except InvalidLoanException as e:
+            print(e)
