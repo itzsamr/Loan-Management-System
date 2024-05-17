@@ -1,5 +1,5 @@
 import pyodbc
-from DBPropertyUtil import DBPropertyUtil
+from .DBPropertyUtil import DBPropertyUtil
 
 
 class DBConnUtil:

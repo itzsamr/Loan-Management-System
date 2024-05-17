@@ -1,1 +1,1 @@
-from InvalidLoanException import InvalidLoanException
+from .InvalidLoanException import InvalidLoanException
