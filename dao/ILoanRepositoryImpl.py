@@ -15,7 +15,7 @@ class ILoanRepositoryImpl(ILoanRepository):
             ).lower()
             if confirm == "yes":
                 cursor.execute(
-                    "INSERT INTO Loans (loanId, customerId, principalAmount, interestRate, loanTerm, loanType, loanStatus) VALUES (?, ?, ?, ?, ?, ?, ?)",
+                    "INSERT INTO Loan (LoanID, CustomerID, PrincipalAmount, InterestRate, LoanTerm, LoanType, LoanStatus) VALUES (?, ?, ?, ?, ?, ?, ?)",
                     (
                         loan.loanId,
                         loan.customer.customerId,
@@ -146,7 +146,7 @@ class ILoanRepositoryImpl(ILoanRepository):
     def getAllLoan(self):
         try:
             cursor = self.connection.cursor()
-            cursor.execute("SELECT * FROM Loans")
+            cursor.execute("SELECT * FROM Loan")
             loans = cursor.fetchall()
             return loans
         except Exception as e:
