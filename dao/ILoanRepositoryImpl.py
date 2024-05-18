@@ -1,11 +1,51 @@
 from .ILoanRepository import ILoanRepository
 from util.DBConnection import DBConnUtil
 from exception.InvalidLoanException import InvalidLoanException
+from decimal import Decimal
+from entity import Customer
 
 
 class ILoanRepositoryImpl(ILoanRepository):
     def __init__(self):
         self.connection = DBConnUtil.get_connection()
+
+    def customer_exists(self, customer_id):
+        cursor = self.connection.cursor()
+        cursor.execute(
+            "SELECT COUNT(1) FROM Customer WHERE CustomerID = ?", (customer_id,)
+        )
+        exists = cursor.fetchone()[0]
+        cursor.close()
+        return exists > 0
+
+    def add_customer(self, customer):
+        try:
+            cursor = self.connection.cursor()
+            cursor.execute(
+                "INSERT INTO Customer (CustomerID, Name, Email, PhoneNumber, Address, CreditScore) VALUES (?, ?, ?, ?, ?, ?)",
+                (
+                    customer.customer_id,
+                    customer.name,
+                    customer.email,
+                    customer.phone_number,
+                    customer.address,
+                    customer.credit_score,
+                ),
+            )
+            self.connection.commit()
+        except Exception as e:
+            print(f"Error adding customer: {e}")
+        finally:
+            cursor.close()
+
+    def get_customer(self, customer_id):
+        cursor = self.connection.cursor()
+        cursor.execute("SELECT * FROM Customer WHERE CustomerID = ?", (customer_id,))
+        result = cursor.fetchone()
+        cursor.close()
+        if result:
+            return Customer(*result)
+        return None
 
     def applyLoan(self, loan):
         try:
@@ -17,13 +57,13 @@ class ILoanRepositoryImpl(ILoanRepository):
                 cursor.execute(
                     "INSERT INTO Loan (LoanID, CustomerID, PrincipalAmount, InterestRate, LoanTerm, LoanType, LoanStatus) VALUES (?, ?, ?, ?, ?, ?, ?)",
                     (
-                        loan.loanId,
-                        loan.customer.customerId,
-                        loan.principalAmount,
-                        loan.interestRate,
-                        loan.loanTerm,
-                        loan.loanType,
-                        "Pending",
+                        loan.get_loan_id(),
+                        loan.get_customer().get_customer_id(),
+                        loan.get_principal_amount(),
+                        loan.get_interest_rate(),
+                        loan.get_loan_term(),
+                        loan.get_loan_type(),
+                        loan.get_loan_status(),
                     ),
                 )
                 self.connection.commit()
@@ -39,7 +79,7 @@ class ILoanRepositoryImpl(ILoanRepository):
         try:
             cursor = self.connection.cursor()
             cursor.execute(
-                "SELECT principalAmount, interestRate, loanTerm FROM Loans WHERE loanId = ?",
+                "SELECT PrincipalAmount, InterestRate, LoanTerm FROM Loan WHERE LoanID = ?",
                 (loanId,),
             )
             loan_data = cursor.fetchone()
@@ -60,20 +100,20 @@ class ILoanRepositoryImpl(ILoanRepository):
         try:
             cursor = self.connection.cursor()
             cursor.execute(
-                "SELECT creditScore FROM Customers WHERE customerId = (SELECT customerId FROM Loans WHERE loanId = ?)",
+                "SELECT CreditScore FROM Customer WHERE CustomerID = (SELECT CustomerID FROM Loan WHERE LoanID = ?)",
                 (loanId,),
             )
             credit_score = cursor.fetchone()[0]
             if credit_score > 650:
                 cursor.execute(
-                    "UPDATE Loans SET loanStatus = 'Approved' WHERE loanId = ?",
+                    "UPDATE Loan SET LoanStatus = 'Approved' WHERE LoanID = ?",
                     (loanId,),
                 )
                 self.connection.commit()
                 return "Loan approved!"
             else:
                 cursor.execute(
-                    "UPDATE Loans SET loanStatus = 'Rejected' WHERE loanId = ?",
+                    "UPDATE Loan SET LoanStatus = 'Rejected' WHERE LoanID = ?",
                     (loanId,),
                 )
                 self.connection.commit()
@@ -87,7 +127,7 @@ class ILoanRepositoryImpl(ILoanRepository):
         try:
             cursor = self.connection.cursor()
             cursor.execute(
-                "SELECT principalAmount, interestRate, loanTerm FROM Loans WHERE loanId = ?",
+                "SELECT PrincipalAmount, InterestRate, LoanTerm FROM Loan WHERE LoanId = ?",
                 (loanId,),
             )
             loan_data = cursor.fetchone()
@@ -111,24 +151,27 @@ class ILoanRepositoryImpl(ILoanRepository):
         try:
             cursor = self.connection.cursor()
             cursor.execute(
-                "SELECT principalAmount, interestRate, loanTerm FROM Loans WHERE loanId = ?",
+                "SELECT PrincipalAmount, InterestRate, LoanTerm FROM Loan WHERE LoanID = ?",
                 (loanId,),
             )
             loan_data = cursor.fetchone()
             if loan_data:
-                principal_amount, interest_rate, loan_term = loan_data
-                r = interest_rate / (12 * 100)  # Monthly interest rate
+                principal_amount = Decimal(loan_data[0])
+                interest_rate = Decimal(loan_data[1])
+                loan_term = int(loan_data[2])
+
+                r = interest_rate / Decimal(
+                    12 * 100
+                )  # Monthly interest rate as Decimal
                 emi = (principal_amount * r * (1 + r) ** loan_term) / (
                     (1 + r) ** loan_term - 1
                 )
-                no_of_emi = int(amount / emi)
-                if amount >= emi:
+
+                no_of_emi = int(Decimal(amount) / emi)
+                if Decimal(amount) >= emi:
                     cursor.execute(
-                        "UPDATE Loans SET noOfEMI = ?, loanStatus = 'Paid' WHERE loanId = ?",
-                        (
-                            no_of_emi,
-                            loanId,
-                        ),
+                        "UPDATE Loan SET LoanStatus = 'Paid' WHERE LoanID = ?",
+                        (loanId,),
                     )
                     self.connection.commit()
                     return f"{no_of_emi} EMIs paid successfully."
@@ -148,7 +191,19 @@ class ILoanRepositoryImpl(ILoanRepository):
             cursor = self.connection.cursor()
             cursor.execute("SELECT * FROM Loan")
             loans = cursor.fetchall()
-            return loans
+            formatted_loans = []
+            for loan in loans:
+                formatted_loan = (
+                    loan[0],
+                    loan[1],
+                    float(loan[2]),
+                    float(loan[3]),
+                    loan[4],
+                    loan[5],
+                    loan[6],
+                )
+                formatted_loans.append(formatted_loan)
+            return formatted_loans
         except Exception as e:
             print(f"Error fetching all loans: {e}")
         finally:
@@ -157,12 +212,21 @@ class ILoanRepositoryImpl(ILoanRepository):
     def getLoanById(self, loanId):
         try:
             cursor = self.connection.cursor()
-            cursor.execute("SELECT * FROM Loans WHERE loanId = ?", (loanId,))
-            loan = cursor.fetchone()
-            if loan:
-                return loan
-            else:
-                raise InvalidLoanException(f"Loan with ID {loanId} not found.")
+            cursor.execute("SELECT * FROM Loan WHERE LoanID = ?", (loanId,))
+            loans = cursor.fetchall()
+            formatted_loans = []
+            for loan in loans:
+                formatted_loan = (
+                    loan[0],
+                    loan[1],
+                    float(loan[2]),
+                    float(loan[3]),
+                    loan[4],
+                    loan[5],
+                    loan[6],
+                )
+                formatted_loans.append(formatted_loan)
+            return formatted_loans
         except InvalidLoanException as e:
             raise e
         except Exception as e:

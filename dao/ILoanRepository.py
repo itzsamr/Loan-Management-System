@@ -29,3 +29,15 @@ class ILoanRepository(ABC):
     @abstractmethod
     def getLoanById(self, loanId):
         pass
+
+    @abstractmethod
+    def customer_exists(self, customer_id):
+        pass
+
+    @abstractmethod
+    def add_customer(self, customer):
+        pass
+
+    @abstractmethod
+    def get_customer(self, customer_id):
+        pass

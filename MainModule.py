@@ -50,19 +50,34 @@ class LoanManagement:
         loan_type = input("Enter Loan Type (CarLoan/HomeLoan): ")
         customer_credit_score = int(input("Enter Customer Credit Score: "))
 
+        if not self.loan_repo.customer_exists(customer_id):
+            print("New customer detected. Please provide customer details.")
+            name = input("Enter Customer Name: ")
+            email = input("Enter Customer Email: ")
+            phone_number = input("Enter Customer Phone Number: ")
+            address = input("Enter Customer Address: ")
+            new_customer = Customer(
+                customer_id, name, email, phone_number, address, customer_credit_score
+            )
+            self.loan_repo.add_customer(new_customer)
+            print("Customer added successfully!")
+        else:
+            new_customer = self.loan_repo.get_customer(customer_id)
+
         loan = Loan(
             loan_id,
-            customer_id,
+            new_customer,
             principal_amount,
             interest_rate,
             loan_term,
             loan_type,
             "Pending",
         )
+
         try:
             self.loan_repo.applyLoan(loan)
-            self.loan_repo.loanStatus(loan_id, customer_credit_score)
-            print("Loan applied successfully!")
+            status = self.loan_repo.loanStatus(loan.get_loan_id())
+            print(status)
         except InvalidLoanException as e:
             print(e)
 
