@@ -27,12 +27,12 @@ The Loan Management System is a simple command-line application that allows user
 
 1. Clone the repository:
     ```sh
-    git clone https://github.com/yourusername/loan-management-system.git
+    git clone https://github.com/itzsamr/Loan-Management-System.git
     ```
 
 2. Navigate to the project directory:
     ```sh
-    cd loan-management-system
+    cd Loan-Management-System
     ```
 
 ## Usage
